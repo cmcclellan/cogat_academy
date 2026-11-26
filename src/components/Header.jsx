@@ -1,174 +1,49 @@
 import React from 'react';
-import { GRADE_LEVELS, BATTERIES, PRACTICE_TESTS } from '../data/cogatData';
-import { Timer, BookOpen, Volume2, VolumeX, Award, Sparkles, Zap } from 'lucide-react';
+import { BATTERIES, PRACTICE_TESTS, ASSESSMENT_TESTS, EXTRA_ACTIVITIES, SESSION_SETS } from '../data/cogatData';
 
-export default function Header({
-  selectedGrade,
-  onSelectGrade,
-  selectedTest,
-  onSelectTest,
-  selectedBattery,
-  onSelectBattery,
-  testMode,
-  onToggleTestMode,
-  autoReadAudio,
-  onToggleAutoRead,
-  timeLeft,
-  totalScore,
-  answeredCount,
-  totalQuestions
-}) {
-  const currentGradeObj = GRADE_LEVELS.find(g => g.id === selectedGrade) || GRADE_LEVELS[2];
-  const currentTestObj = PRACTICE_TESTS.find(t => t.id === selectedTest) || PRACTICE_TESTS[0];
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 py-3">
-        {/* Top Tier: Title, Grade Selector, Test Selector, Mode, Auto-Read */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-2xl shadow-md">
-              🧠
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-lg sm:text-xl font-bold font-heading text-slate-800 tracking-tight">
-                  CogAT Prep Academy
-                </h1>
-                <span className="bg-amber-100 text-amber-800 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border border-amber-300">
-                  Free
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium">
-                {currentGradeObj.name} ({currentGradeObj.level}) • <span className="text-sky-600 font-bold">{currentTestObj.name}</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Controls: Grade selector, Test selector, Mode switcher, Auto-Audio */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-            {/* Grade Selector */}
-            <select
-              value={selectedGrade}
-              onChange={(e) => onSelectGrade(e.target.value)}
-              className="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold font-heading py-2 px-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer transition"
-              title="Select Grade Level"
-            >
-              {GRADE_LEVELS.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name} ({g.level}) {g.id === '2' ? '⭐ Recommended' : ''}
-                </option>
-              ))}
-            </select>
-
-            {/* Test Selector Dropdown */}
-            <select
-              value={selectedTest}
-              onChange={(e) => onSelectTest(e.target.value)}
-              className="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs sm:text-sm font-bold font-heading py-2 px-3 rounded-xl border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer transition"
-              title="Select Practice Test or Infinite Generator"
-            >
-              {PRACTICE_TESTS.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.badge})
-                </option>
-              ))}
-            </select>
-
-            {/* Mode Switcher: Practice vs Timed */}
-            <div className="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
-              <button
-                type="button"
-                onClick={() => onToggleTestMode('practice')}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold font-heading transition ${
-                  testMode === 'practice'
-                    ? 'bg-white text-sky-700 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>Practice</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onToggleTestMode('timed')}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold font-heading transition ${
-                  testMode === 'timed'
-                    ? 'bg-rose-500 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Timer className="w-3.5 h-3.5" />
-                <span>Timed Exam</span>
-              </button>
-            </div>
-
-            {/* Auto-read speech toggle */}
-            <button
-              type="button"
-              onClick={onToggleAutoRead}
-              className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1 transition ${
-                autoReadAudio
-                  ? 'bg-sky-50 text-sky-700 border-sky-300'
-                  : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
-              }`}
-              title={autoReadAudio ? "Voice read-aloud is ON" : "Voice read-aloud is OFF"}
-            >
-              {autoReadAudio ? <Volume2 className="w-4 h-4 text-sky-600" /> : <VolumeX className="w-4 h-4" />}
-              <span className="hidden lg:inline">{autoReadAudio ? 'Voice ON' : 'Voice OFF'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Lower Tier: Battery Selector Pills & Progress */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mt-3 pt-2 border-t border-slate-100">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {BATTERIES.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                onClick={() => onSelectBattery(b.id)}
-                className={`text-xs font-bold font-heading px-3 py-1 rounded-full border transition ${
-                  selectedBattery === b.id
-                    ? 'bg-sky-500 text-white border-sky-600 shadow-sm'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-                }`}
-              >
-                {b.name.split(' (')[0]}
-              </button>
-            ))}
-
-            {selectedTest === 'infinite' && (
-              <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full border border-amber-300 animate-pulse">
-                <Zap className="w-3 h-3 text-amber-600" />
-                Infinite Questions Active
-              </span>
-            )}
-          </div>
-
-          {/* Status Indicators */}
-          <div className="flex items-center gap-3 text-xs font-semibold text-slate-600">
-            {testMode === 'timed' && (
-              <div className="flex items-center gap-1.5 text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full font-mono font-bold">
-                <Timer className="w-3.5 h-3.5" />
-                <span>Time: {formatTime(timeLeft)}</span>
-              </div>
-            )}
-
-            <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-full">
-              <Award className="w-3.5 h-3.5 text-amber-500" />
-              <span>Score: {totalScore} / {answeredCount}</span>
-            </div>
-          </div>
-        </div>
+export default function Header({ config, onChange, autoReadAudio, onToggleAutoRead, answeredCount, totalQuestions }) {
+  const tests = config.mode === 'assessment' ? ASSESSMENT_TESTS : PRACTICE_TESTS;
+  const selectedSet = SESSION_SETS.find(t => t.id === config.testId);
+  const extra = EXTRA_ACTIVITIES.some(t => t.id === config.testId);
+  const filteredBattery = BATTERIES.find(b => b.id === config.batteryId);
+  return <header className="bg-white border-b border-slate-200">
+    <div className="max-w-5xl mx-auto p-4 space-y-3">
+      <div className="flex flex-wrap justify-between items-center gap-3">
+        <div><h1 className="text-xl font-bold font-heading">CogAT Prep Academy</h1>
+          <p className="text-sm text-slate-600">Grade 2 | Level 8</p></div>
+        <p className="text-sm font-bold">Answered: {answeredCount} / {totalQuestions}</p>
       </div>
-    </header>
-  );
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-sm font-bold">{config.mode === 'assessment' ? 'Assessment' : 'Practice test'}
+          <select value={extra ? '' : config.testId} onChange={e => onChange({ testId: e.target.value })} className="ml-2 max-w-full rounded-xl border bg-slate-50 p-2">
+            {extra && <option value="" disabled>Choose a practice test</option>}
+            {tests.map(t => <option key={t.id} value={t.id}>{t.name} ({t.count} questions)</option>)}
+          </select>
+        </label>
+        <div role="group" aria-label="Session mode" className="flex gap-1 rounded-xl bg-slate-100 p-1">
+          {[['practice', 'Practice'], ['assessment', 'Assessment']].map(([mode, name]) => <button key={mode} aria-pressed={config.mode === mode}
+            onClick={() => onChange({ mode })} className={`rounded-lg px-3 py-2 text-sm font-bold ${config.mode === mode ? 'bg-sky-700 text-white' : 'text-slate-700'}`}>{name}</button>)}
+        </div>
+        <button onClick={onToggleAutoRead} aria-pressed={autoReadAudio} className="rounded-xl border p-2 text-sm font-bold">Auto-read: {autoReadAudio ? 'On' : 'Off'}</button>
+      </div>
+      <p className="text-sm text-slate-600">{extra && <strong>{selectedSet.name}: </strong>}{selectedSet?.description}</p>
+      {config.batteryId !== 'all' && <p className="text-sm font-bold text-sky-800">Practicing {filteredBattery?.name} only. Change this in Practice options.</p>}
+      <details className="text-sm border-t pt-2">
+        <summary className="cursor-pointer font-bold text-slate-700 py-1">Practice options</summary>
+        <div className="space-y-3 pt-3">
+          <div role="group" aria-label="Battery" className="flex flex-wrap items-center gap-2">
+            <span className="font-bold">Focus:</span>
+            {BATTERIES.map(b => <button key={b.id} aria-pressed={config.batteryId === b.id} onClick={() => onChange({ batteryId: b.id })}
+              className={`rounded-full border px-3 py-2 font-bold ${config.batteryId === b.id ? 'bg-sky-700 text-white' : 'bg-white text-slate-700'}`}>{b.id === 'all' ? 'All batteries' : b.name}</button>)}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-bold">Extra skill practice:</span>
+            {EXTRA_ACTIVITIES.map(activity => <button key={activity.id} aria-pressed={config.testId === activity.id}
+              onClick={() => onChange({ testId: activity.id })} className="rounded-xl border px-3 py-2 font-bold hover:bg-slate-100">{activity.name}</button>)}
+          </div>
+          <p className="text-slate-600">Extra activities support reasoning skills and are excluded from assessments. All sessions are untimed.</p>
+        </div>
+      </details>
+    </div>
+  </header>;
 }

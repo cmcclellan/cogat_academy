@@ -1,121 +1,75 @@
-import React from 'react';
-import { X, CheckCircle2, AlertCircle, HelpCircle, HeartHandshake } from 'lucide-react';
+import React, { useEffect, useId, useRef } from 'react';
 import { Shape } from './renderers/FigureMatrixRenderer';
 import { UnfoldedPaperChoice } from './renderers/PaperFoldingRenderer';
+import { PictureCard } from './renderers/PictureCardRenderer';
+import Quantity from './renderers/QuantityRenderer';
+import { SpatialScene } from './renderers/SpatialFigureRenderer';
 
 export default function ExplanationModal({ isOpen, onClose, question, selectedAnswer }) {
+  const dialogRef = useRef(null);
+  const titleId = useId();
+  const descriptionId = useId();
+
+  useEffect(() => {
+    if (!isOpen || !question) return;
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement;
+    dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+    };
+  }, [isOpen, question?.id]);
+
   if (!isOpen || !question) return null;
-
-  const isCorrect = selectedAnswer === question.correctAnswer;
   const { explanation } = question;
-  const correctOpt = question.options[question.correctAnswer];
-  const correctLetter = String.fromCharCode(65 + question.correctAnswer);
+  const correctOption = question.options[question.correctAnswer];
+  const correctLetter = correctOption.id;
+  const answered = selectedAnswer !== undefined;
+  const correct = selectedAnswer === question.correctAnswer;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-pop">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border-4 border-amber-200 overflow-y-auto max-h-[90vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b pb-3 mb-4">
-          <div className="flex items-center gap-2">
-            {isCorrect ? (
-              <div className="flex items-center gap-2 text-emerald-600 font-heading text-xl font-bold">
-                <CheckCircle2 className="w-7 h-7" />
-                <span>You Got It Right! 🎉</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-sky-600 font-heading text-xl font-bold">
-                <HelpCircle className="w-7 h-7" />
-                <span>Let's Learn the Secret Rule! 💡</span>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+  function renderCorrectOption() {
+    if (correctOption.scene) return <div className="w-28 h-28"><SpatialScene scene={correctOption.scene} /></div>;
+    if (correctOption.shape) return <div className="w-24 h-24"><Shape {...correctOption.shape} /></div>;
+    if (correctOption.holes || correctOption.cuts) return <div className="w-24 h-24"><UnfoldedPaperChoice holes={correctOption.holes} cuts={correctOption.cuts} creases={correctOption.creases} /></div>;
+    if (correctOption.emoji || correctOption.illustration) return <PictureCard {...correctOption} />;
+    if (correctOption.quantity !== undefined) return <Quantity count={correctOption.quantity} />;
+    return <span className="text-lg font-bold">{correctOption.text || correctOption.label}</span>;
+  }
 
-        {/* Content */}
-        <div className="space-y-4 text-slate-700">
-          {/* Rule banner */}
-          <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4">
-            <span className="text-xs uppercase font-bold text-sky-600 tracking-wider block font-heading">
-              The Cognitive Rule
-            </span>
-            <span className="text-base font-bold text-sky-900 mt-1 block">
-              {explanation.rule}
-            </span>
-            <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-              {explanation.description}
-            </p>
-          </div>
-
-          {/* Correct Answer Reminder */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center font-heading text-sm shrink-0">
-              {correctLetter}
-            </div>
-            <div className="flex items-center gap-2.5">
-              <div>
-                <span className="text-xs font-semibold text-emerald-700 block">Correct Choice:</span>
-                <span className="text-sm font-bold text-emerald-950 flex items-center gap-2 mt-0.5">
-                  <span>Choice {correctLetter}</span>
-                  {correctOpt?.emoji && <span>{correctOpt.emoji} {correctOpt.label}</span>}
-                  {correctOpt?.text && <span>({correctOpt.text})</span>}
-                </span>
-              </div>
-              {correctOpt?.shape && (
-                <div className="w-10 h-10 border border-emerald-200 bg-white rounded-lg p-1 flex items-center justify-center ml-2">
-                  <Shape {...correctOpt.shape} size={32} />
-                </div>
-              )}
-              {correctOpt?.holes && (
-                <div className="w-10 h-10 border border-emerald-200 bg-white rounded-lg p-1 flex items-center justify-center ml-2">
-                  <UnfoldedPaperChoice holes={correctOpt.holes} creases={correctOpt.creases} size={32} />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Why other options don't fit */}
-          {explanation.whyOthersWrong && (
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5">
-              <span className="text-xs font-bold text-slate-600 block mb-1 flex items-center gap-1 font-heading">
-                <AlertCircle className="w-3.5 h-3.5 text-slate-500" />
-                Why Other Choices Don't Fit:
-              </span>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {explanation.whyOthersWrong}
-              </p>
-            </div>
-          )}
-
-          {/* Parent Coaching Tip */}
-          {explanation.parentTip && (
-            <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4">
-              <span className="text-xs font-bold text-amber-800 block mb-1 flex items-center gap-1.5 font-heading">
-                <HeartHandshake className="w-4 h-4 text-amber-600" />
-                Parent Coaching Tip:
-              </span>
-              <p className="text-xs sm:text-sm text-amber-900 leading-relaxed font-medium">
-                {explanation.parentTip}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Got it Button */}
-        <div className="mt-6 pt-3 border-t">
-          <button
-            onClick={onClose}
-            className="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-heading font-bold rounded-2xl shadow-md transition transform active:scale-95"
-          >
-            I Understand, Next Question! 🚀
-          </button>
-        </div>
+  return <dialog ref={dialogRef} aria-labelledby={titleId} aria-describedby={descriptionId}
+    onCancel={event => { event.preventDefault(); onClose(); }}
+    className="m-auto w-[calc(100%_-_2rem)] max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border-2 border-sky-200 bg-white p-5 sm:p-6 shadow-2xl backdrop:bg-slate-900/60">
+    <div className="flex items-start justify-between gap-3 border-b pb-3 mb-4">
+      <div>
+        <h2 id={titleId} className="text-xl font-bold font-heading text-slate-900">{correct ? 'You found the rule' : 'Explore the rule'}</h2>
+        <p id={descriptionId} className="mt-1 text-sm text-slate-600">{!answered ? 'You did not answer this question.' : correct ? 'Your answer was correct.' : 'Compare your answer with the reasoning below.'}</p>
       </div>
+      <button autoFocus type="button" onClick={onClose} aria-label="Close explanation"
+        className="rounded-lg border px-3 py-2 text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-sky-700">Close</button>
     </div>
-  );
+    <div className="space-y-4 text-slate-800">
+      {answered && !correct && question.options[selectedAnswer]?.misconception && <section className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <h3 className="font-bold">Think about your choice</h3>
+        <p className="mt-2 text-sm leading-relaxed">{question.options[selectedAnswer].misconception}</p>
+      </section>}
+      <section className="rounded-xl border border-sky-200 bg-sky-50 p-4">
+        <h3 className="font-bold">{explanation.rule}</h3>
+        <p className="mt-2 text-sm leading-relaxed">{explanation.description}</p>
+      </section>
+      <section className="rounded-xl border border-emerald-300 bg-emerald-50 p-4">
+        <h3 className="font-bold text-emerald-950">Correct answer: Choice {correctLetter}</h3>
+        <div className="mt-3 flex justify-center">{renderCorrectOption()}</div>
+      </section>
+      {explanation.whyOthersWrong && <section className="rounded-xl border bg-slate-50 p-4">
+        <h3 className="font-bold">Why the other choices do not fit</h3>
+        <p className="mt-2 text-sm leading-relaxed">{explanation.whyOthersWrong}</p>
+      </section>}
+      {explanation.parentTip && <section className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <h3 className="font-bold">Parent coaching tip</h3>
+        <p className="mt-2 text-sm leading-relaxed">{explanation.parentTip}</p>
+      </section>}
+    </div>
+    <button type="button" onClick={onClose} className="mt-5 w-full rounded-xl bg-sky-700 px-4 py-3 font-bold text-white hover:bg-sky-800">Back to question</button>
+  </dialog>;
 }

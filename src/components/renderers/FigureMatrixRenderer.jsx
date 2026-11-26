@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 /**
  * Universal SVG Shape Renderer
  * Renders primitive and composite geometric shapes with transforms, fills, and patterns
  */
 export function Shape({ shape, fill = 'none', color = '#1e293b', rotation = 0, size = 60, innerShape = null, dots = 0, lines = 0, isLarge = false }) {
+  const patternId = useId().replaceAll(':', '');
+  const fillName = value => ({ none: 'outline', solid: 'solid', semi: 'lightly shaded', striped: 'striped' })[value || 'none'];
+  const sizeName = size <= 30 ? 'small' : size < 60 ? 'medium' : 'large';
+  const description = `${sizeName} ${fillName(fill)} ${shape.replaceAll('_', ' ')}${rotation ? ` rotated ${rotation} degrees` : ''}${dots ? ` with ${dots} dots` : ''}${innerShape ? ` with an inner ${fillName(innerShape.fill)} ${innerShape.shape}` : ''}${lines ? ` with ${lines} lines` : ''}`;
   const s = isLarge ? size * 1.25 : size;
   const center = 50;
   const half = s / 2;
-  const fillColor = fill === 'solid' ? color : fill === 'semi' ? `${color}33` : fill === 'striped' ? 'url(#stripe-pattern)' : 'none';
+  const fillColor = fill === 'solid' ? color : fill === 'semi' ? `${color}33` : fill === 'striped' ? `url(#${patternId})` : 'none';
   const strokeWidth = 2.5;
 
   // Render base shape path
@@ -95,23 +99,14 @@ export function Shape({ shape, fill = 'none', color = '#1e293b', rotation = 0, s
   // Render internal dots if any
   const renderDots = () => {
     if (!dots || dots <= 0) return null;
-    const dotElements = [];
-    if (dots === 1) {
-      dotElements.push(<circle key="dot1" cx={center} cy={center} r="4" fill={color} />);
-    } else if (dots === 2) {
-      dotElements.push(<circle key="dot1" cx={center - 10} cy={center} r="3.5" fill={color} />);
-      dotElements.push(<circle key="dot2" cx={center + 10} cy={center} r="3.5" fill={color} />);
-    } else if (dots === 3) {
-      dotElements.push(<circle key="dot1" cx={center} cy={center - 8} r="3.5" fill={color} />);
-      dotElements.push(<circle key="dot2" cx={center - 10} cy={center + 8} r="3.5" fill={color} />);
-      dotElements.push(<circle key="dot3" cx={center + 10} cy={center + 8} r="3.5" fill={color} />);
-    } else if (dots === 4) {
-      dotElements.push(<circle key="dot1" cx={center - 10} cy={center - 10} r="3.5" fill={color} />);
-      dotElements.push(<circle key="dot2" cx={center + 10} cy={center - 10} r="3.5" fill={color} />);
-      dotElements.push(<circle key="dot3" cx={center - 10} cy={center + 10} r="3.5" fill={color} />);
-      dotElements.push(<circle key="dot4" cx={center + 10} cy={center + 10} r="3.5" fill={color} />);
-    }
-    return <g>{dotElements}</g>;
+    // Keep every dot inside even small stars and narrow arrow stems.
+    const positions = {
+      1: [[0, 0]], 2: [[-7, 0], [7, 0]],
+      3: [[0, -6], [-7, 6], [7, 6]],
+      4: [[-6, -6], [6, -6], [-6, 6], [6, 6]]
+    }[dots] || [];
+    const scale = s / 60;
+    return <g>{positions.map(([x, y], i) => <circle key={i} cx={center + x * scale} cy={center + y * scale} r={3 * scale} fill={color} />)}</g>;
   };
 
   // Render division lines if any
@@ -135,19 +130,20 @@ export function Shape({ shape, fill = 'none', color = '#1e293b', rotation = 0, s
   };
 
   return (
-    <svg viewBox="0 0 100 100" className="w-full h-full max-w-[90px] max-h-[90px] mx-auto select-none">
+    <svg role="img" aria-label={description} viewBox="0 0 100 100" className="w-full h-full max-w-[90px] max-h-[90px] mx-auto select-none">
       <defs>
-        <pattern id="stripe-pattern" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+        <clipPath id={`${patternId}-shape`}>{React.cloneElement(renderBase(), { fill: '#fff', stroke: 'none' })}</clipPath>
+        <pattern id={patternId} width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
           <line x1="0" y1="0" x2="0" y2="8" stroke={color} strokeWidth="2.5" />
         </pattern>
       </defs>
       <g transform={`rotate(${rotation} ${center} ${center})`}>
         {renderBase()}
-        {renderLines()}
+        <g clipPath={`url(#${patternId}-shape)`}>{renderLines()}</g>
         {innerShape && (
-          <g transform={`scale(0.5) translate(${center}, ${center})`}>
-            <Shape {...innerShape} size={size * 0.5} />
-          </g>
+          <svg x="25" y="25" width="50" height="50" viewBox="0 0 100 100">
+            <Shape {...innerShape} size={size} />
+          </svg>
         )}
         {renderDots()}
       </g>
