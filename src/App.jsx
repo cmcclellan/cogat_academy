@@ -56,7 +56,7 @@ export default function App() {
       {stage === 'intro' ? <section className="max-w-2xl mx-auto bg-white p-6 rounded-2xl border space-y-4">
         <h2 className="text-2xl font-bold">Before your Grade 2 assessment</h2>
         <p>This is an independent practice sample with {questions.length} questions. It is not a full-length or standardized CogAT test.</p>
-        <p>Only Level 8 format questions are included. Supporting activities and enrichment are kept in separate practice collections.</p>
+        <p>Only Level 8 format questions are included. Supporting activities and enrichment are excluded from assessments.</p>
         {config.testId.startsWith('check_') && <p className="rounded-xl bg-sky-50 p-3">These questions are reserved from routine practice. Try a check after practicing; use a different check next time to reduce answer recall.</p>}
         <ul className="list-disc pl-5 space-y-2">
           <li>There is no countdown. CogAT Level 8 subtests are untimed.</li>

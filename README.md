@@ -18,7 +18,7 @@ The curated bank contains **310 Grade 2 activities**: **198 Level 8 format pract
 
 **Assessment mode offers three numbered assessments**, each with 22 reserved format questions: six verbal, six quantitative, and ten nonverbal. These 66 questions are excluded from routine practice and enrichment. Entering assessment mode starts at Assessment 1. Use a different assessment for a later attempt; the app does not track lifetime exposure across page refreshes.
 
-The main selector shows only the tests for the selected mode. Battery filters, Skill builders, and Generated practice are under the collapsed **Practice options** section. The previous full-bank and difficulty-collection choices are replaced by the six practice tests; no questions were removed.
+The main selector shows only the six practice tests or three assessments for the selected mode. All tests cover all three batteries. Battery filters and extra activity controls have been removed to keep test selection simple.
 
 ### Level 8 format and enrichment
 
@@ -32,21 +32,21 @@ The alignment uses Riverside's [level-specific test descriptions](https://online
 | Figure Matrices and Classification | Existing figure transformations plus 24 arrangement questions involving movement, reflection, exchanges, relative positions, and multiple figures | Generated spatial skill practice |
 | Paper Folding | Existing circular punches plus 24 cutout activities: triangles, squares, edge notches, crease joins, multiple punches, and mixed modifications | Generated fold practice |
 
-**Level 8 format** means an independently authored activity uses the published task and response format. It does not mean Riverside validated the item, that difficulty matches an official form, or that every possible reasoning pattern is covered. The 46 scaffold activities remain available under **Practice options ? Skill builders**; they cannot enter assessments. Generated activities are also labeled enrichment. The session builder enforces the separation in addition to the UI labels.
+**Level 8 format** means an independently authored activity uses the published task and response format. It does not mean Riverside validated the item, that difficulty matches an official form, or that every possible reasoning pattern is covered. The 46 scaffold activities and generated enrichment remain in the codebase but are not offered in the student interface; they cannot enter assessments. The session builder enforces the separation in addition to the UI labels.
 
 New questions include reasoning-skill metadata, explanations, and feedback tied to the selected distractor's likely misconception. Fold diagrams, cutout choices, and unfolding demonstrations are built from the same geometry. Cut regions are clipped to the folded paper and reflected in reverse fold order; joined openings are shown as one removed region rather than separate outlined pieces.
 
 Question prompts and read-aloud scripts give directions without disclosing the reasoning rule. Answer choices do not display category or function captions that reveal the solution. Answer positions are balanced when a session is created and remain stable during that session.
 
-Level 8 Number Puzzles display equations and numeral answer choices. Quantity analogies and series retain pictorial quantities. Object trains remain available as enrichment. Code-native illustrations replace pictures that previously depicted a different object. Paper-fold diagrams, choices, and unfolding demonstrations use a shared geometric model, including punches centered on a crease or the intersection of folds.
+Level 8 Number Puzzles display equations and numeral answer choices. Quantity analogies and series retain pictorial quantities. Object trains are retained in the enrichment bank. Code-native illustrations replace pictures that previously depicted a different object. Paper-fold diagrams, choices, and unfolding demonstrations use a shared geometric model, including punches centered on a crease or the intersection of folds.
 
-Generated enrichment covers six quantitative and nonverbal subtests only. It does not generate verbal questions, provide calibrated difficulty, or constitute a readiness assessment. Selecting verbal generated practice shows an availability message and a route back to curated questions; the app does not silently substitute another battery.
+Generated enrichment covers six quantitative and nonverbal subtests only. It does not generate verbal questions, provide calibrated difficulty, or constitute a readiness assessment. Generated practice is retained in the codebase but is not offered in the student interface.
 
 ## Student modes
 
 **Practice** gives immediate feedback after an answer. The student can open the explanation and parent coaching tip. For paper folding, the demonstration becomes available after answering.
 
-**Assessment (untimed)** uses a fixed curated question set. An introduction explains the session before it begins. Reserved assessments use their own fixed questions, separate from the six feedback-based practice tests. Students select an answer and use Next themselves; they may revisit questions and revise choices before submission. The app shows answered-question counts without revealing correctness, coaching, or unfolding demonstrations. Enrichment and generated activities are excluded from this mode. Selecting an enrichment collection switches to practice mode.
+**Assessment (untimed)** uses a fixed curated question set. An introduction explains the session before it begins. Reserved assessments use their own fixed questions, separate from the six feedback-based practice tests. Students select an answer and use Next themselves; they may revisit questions and revise choices before submission. The app shows answered-question counts without revealing correctness, coaching, or unfolding demonstrations. Enrichment and generated activities are excluded from this mode.
 
 Finishing opens a submission check that lists unanswered questions and offers a route back to them. Submitting locks the answers. Students can then review every question, including unanswered questions, and read its explanation without changing the recorded results. Changing session settings after answering requires confirmation before clearing the current session.
 
